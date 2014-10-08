@@ -1,0 +1,178 @@
+##
+## .screenrc - Updated April, 22th 2008
+## Written by Christian Lauf <christian@t-imeout.de>
+##
+## Initial work done by: Stephan Schmieder <ssc@unixgu.ru>
+## I used his work as a base for mine.
+##
+
+########################################################
+#                                                      #
+#         Basic shell and screen configuration         #
+#                                                      #
+########################################################
+
+##
+## Scrollback buffer in lines
+##
+defscrollback 1000
+
+##
+## My shell
+##
+shell /bin/bash
+
+##
+## No copyright message
+##
+startup_message off
+
+##
+## Caption line
+##
+##  resolves to:
+##   [hostname ][windowlist][month and day][time]
+##
+caption always "%{WB}%H %{kG}%?%-Lw%?%{bw}%n*%f %t%?(%u)%?%{kG}%?%+Lw%? %88=%{YR}%M%d %94=%{RY}%c%="
+
+##
+## Passwort protect my screen-session
+##
+## Don't know how to do this?
+## 1. Ctrl + : this asks for a new password and puts it into the copybuffer
+## 2. Ctrl+a ] puts this into the current window (use an empty textfile for example and your screen config)
+## 3. Put the password parameter followed by the hash you got into your .screenrc (see below)
+## 3. Ctrl+a [ followed by W (Shift+w) switches to copy mode and puts a word there,
+##             now your copybuffer doesn't contain the password anymore
+#password fill-your-password-in-and-comment-out
+
+##
+## Nice window title for each new window
+##  resolves to: [user@host] screen
+##
+defhstatus "[$USER@^%H] screen"
+
+##
+## Automated Screensession configuration
+## What programs are started where, if a new screensession is started.
+##
+#screen -t bash 0 bash
+#screen -t bash 1 bash
+#screen -t htop 2 htop
+
+
+########################################################
+#                                                      #
+#                     Keybindings                      #
+#                                                      #
+########################################################
+
+##
+## Keybindings - Programs
+##
+## The bind key is activated by pressing ctrl+a + bindkey
+##   -t is the windowname
+##   The number is the windownumber in which the program will start
+##
+##
+## To make the sudo commands work with your non-root user
+## you need to have a appropriate sudoers file.
+##
+bind c screen -t bash    0 bash -l
+bind n screen -t netstat 1 sudo watch netstat -pan
+bind l screen -t lsof    2 sudo watch lsof -i
+bind h screen -t htop    3 sudo htop
+bind i screen -t icq     4 centerim --bind ip.ip.ip.ip
+bind r screen -t irc     5 irssi -h chat.domain.tld
+bind s screen -t silc    6 silc -h chat.domain.tld
+
+##
+## use F7 and F8 to cycle trough the windows
+##
+bindkey -k k7 prev
+bindkey -k k8 next
+
+##
+## unbind some keys
+##
+#bind .
+#bind ^\
+#bind \\
+#bind K
+
+##
+## Keybindings - screen regions
+##
+bind j focus down
+bind k focus up
+bind t focus top
+bind b focus bottom
+
+
+
+########################################################
+#                                                      #
+#               Terminal configuration                 #
+#                                                      #
+########################################################
+
+##
+## Mouse support in screen
+## See: http://arcknowledge.com/gnu.screen.user/2004-09/msg00022.html
+##
+term rxvt
+
+##
+## termcap stuff
+##
+#termcapinfo xterm     ti@:te@
+
+##
+## make the cursor show up in red:
+##
+#termcapinfo linux "ve=\E[?25h\E[?17;0;64c"
+## this makes screen work within rxvt on cygwin:
+#termcapinfo rxvt-cygwin-native ti@:te@
+
+##
+## Add no utmp entry for new windows
+##
+deflogin off
+
+########################################################
+#                                                      #
+#            Bell and activity monitoring              #
+#                                                      #
+########################################################
+
+##
+## show messages for 2 seconds
+##
+msgwait 2
+
+
+##
+## Define the time that all windows monitored for silence
+## should wait before displaying a message.
+##
+#silencewait 15
+
+##
+## "activity in window #%n title: %t~"
+##
+#activity "%C -> %n%f %t activity!"
+
+##
+## pass on the "beep" (CTRL-G) by adding a '~':
+##
+#bell "%C -> %n%f %t bell!~"
+
+##
+## set colors for "messages" and "text marking"
+##
+#sorendition    kG
+
+##
+## console-screensave, (!)doesn't lock(!)
+##
+# idle 180 eval "screen cmatrix" "idle 0"

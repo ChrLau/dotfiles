@@ -19,6 +19,8 @@ alias r='sudo -i'
 alias cvsst='cvs status 2>&1 | egrep "(^\? |Status: )" | grep -v Up-to-date'
 alias cvsgrep='grep --exclude=".#*" -r'
 alias svngrep='grep --exclude-dir ".svn" -r'
+
+# rdesktop alias
 alias winbox='read -s -p "Enter Password:" mypassword;rdesktop -a 16 -k de -g 1280x1024 -u $USER -d DOMAIN -p $mypassword winbox.lan.domain &'
 
 

@@ -5,12 +5,35 @@ HISTCONTROL=ignoredups
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=10000
+HISTFILESIZE=20000
 
 
 alias ll='ls -lach'
 alias lS='ls -lachS'
+
+alias r='sudo -i'
+
+
+# Version Control System aliases
+alias cvsst='cvs status 2>&1 | egrep "(^\? |Status: )" | grep -v Up-to-date'
+alias cvsgrep='grep --exclude=".#*" -r'
+alias svngrep='grep --exclude-dir ".svn" -r'
+alias winbox='read -s -p "Enter Password:" mypassword;rdesktop -a 16 -k de -g 1280x1024 -u $USER -d DOMAIN -p $mypassword winbox.lan.domain &'
+
+
+##
+## Bash completion for SSH Hosts
+##
+complete -F _known_hosts s
+complete -F _known_hosts host
+complete -F _known_hosts ping
+complete -F _known_hosts traceroute
+
+# Keychain Config
+/usr/bin/keychain --nogui -q --agents ssh chrlauf
+[ -z "$HOSTNAME" ] && HOSTNAME=`uname -n`
+[ -f $HOME/.keychain/$HOSTNAME-sh ] && . $HOME/.keychain/$HOSTNAME-sh
 
 
 # Colored manpages

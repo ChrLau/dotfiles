@@ -1,3 +1,17 @@
+# Prompt settings
+# Yeah.. Debian.. I go the easy way and just change the default prompt to one with colours..
+if [ "$color_prompt" = yes ]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[1;34m\]\u\[\033[0m\]@\[\033[1;35m\]\h\[\033[0m\]:\[\033[1;32m\]\w\[\033[0m\]\$ '
+    #PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
+
+
+#Add timestamps and linenumbers to .bash_history
+HISTTIMEFORMAT='%F %T '
+
 # don't put duplicate lines in the history, but lines starting with space
 HISTCONTROL=ignoredups
 
@@ -8,12 +22,16 @@ shopt -s histappend
 HISTSIZE=10000
 HISTFILESIZE=20000
 
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
 
+
+# Aliases
 alias ll='ls -lach'
 alias lS='ls -lachS'
 
 alias r='sudo -i'
-
 
 # Version Control System aliases
 alias cvsst='cvs status 2>&1 | egrep "(^\? |Status: )" | grep -v Up-to-date'

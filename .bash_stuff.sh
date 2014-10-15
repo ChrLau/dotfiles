@@ -1,5 +1,3 @@
-```bash
-
 # Prompt settings
 # Yeah.. Debian.. I go the easy way and just change the default prompt to one with colours..
 if [ "$color_prompt" = yes ]; then
@@ -74,4 +72,3 @@ export LESS_TERMCAP_se=$'\E[0m'           # end standout-mode
 export LESS_TERMCAP_so=$'\E[38;5;246m'    # begin standout-mode - info box
 export LESS_TERMCAP_ue=$'\E[0m'           # end underline
 
-```

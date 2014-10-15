@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Prompt settings
 # Yeah.. Debian.. I go the easy way and just change the default prompt to one with colours..
 if [ "$color_prompt" = yes ]; then

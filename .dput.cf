@@ -1,0 +1,9 @@
+[DEFAULT]
+default_host_main = foobar
+
+[foobar]
+fqdn = someinternal-repo
+login = username
+incoming = /repo/incoming/user
+method = scp
+allow_unsigned_uploads = true

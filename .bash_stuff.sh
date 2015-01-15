@@ -38,6 +38,15 @@ alias r='sudo -i'
 alias cvsst='cvs status 2>&1 | egrep "(^\? |Status: )" | grep -v Up-to-date'
 alias cvsgrep='grep --exclude=".#*" -r'
 alias svngrep='grep --exclude-dir ".svn" -r'
+alias svnprop='svn propset svn:keywords "Id Date Author HeadURL Header Revision"'
+svngrepfind() { find . -type f -not -path "*/.svn/*" -exec grep -l "$*" '{}' ';';  }
+svnaddallindir() { svn add $(svn st | grep ^? | awk '{print $2}' | paste -s); }
+
+# Config file stuff
+# Opens all files with the specified name found in the current directory or below
+viap() { vi $(find . -name apache.properties | paste -s); }
+visp() { vi $(find . -name secret.properties | paste -s); }
+vitp() { vi $(find . -name "tomcat?.properties" | paste -s); }
 
 # rdesktop alias
 alias winbox='read -s -p "Enter Password:" mypassword;rdesktop -a 16 -k de -g 1280x1024 -u $USER -d DOMAIN -p $mypassword winbox.lan.domain &'

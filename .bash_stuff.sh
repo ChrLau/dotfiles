@@ -39,6 +39,8 @@ alias cvsst='cvs status 2>&1 | egrep "(^\? |Status: )" | grep -v Up-to-date'
 alias cvsgrep='grep --exclude=".#*" -r'
 alias svngrep='grep --exclude-dir ".svn" -r'
 alias svnprop='svn propset svn:keywords "Id Date Author HeadURL Header Revision"'
+alias svnpropx='svn propset svn:executable on'
+alias svnpropdelx='svn propdel svn:executable'
 svngrepfind() { find . -type f -not -path "*/.svn/*" -exec grep -l "$*" '{}' ';';  }
 svnaddallindir() { svn add $(svn st | grep ^? | awk '{print $2}' | paste -s); }
 

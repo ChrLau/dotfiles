@@ -84,12 +84,6 @@ complete -F _known_hosts host
 complete -F _known_hosts ping
 complete -F _known_hosts traceroute
 
-# Keychain Config
-/usr/bin/keychain --nogui -q --agents ssh chrlauf
-[ -z "$HOSTNAME" ] && HOSTNAME=`uname -n`
-[ -f $HOME/.keychain/$HOSTNAME-sh ] && . $HOME/.keychain/$HOSTNAME-sh
-
-
 # Colored manpages
 # CHANGE FIRST NUMBER PAIR FOR COMMAND AND FLAG COLOR
 # currently 1;31 which is bold red

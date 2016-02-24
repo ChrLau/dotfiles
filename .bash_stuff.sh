@@ -106,3 +106,7 @@ export LESS_TERMCAP_se=$'\E[0m'           # end standout-mode
 export LESS_TERMCAP_so=$'\E[38;5;246m'    # begin standout-mode - info box
 export LESS_TERMCAP_ue=$'\E[0m'           # end underline
 
+# Keychain Config
+/usr/bin/keychain --nogui -q --agents ssh $USER
+[ -z "$HOSTNAME" ] && HOSTNAME=`uname -n`
+[ -f $HOME/.keychain/$HOSTNAME-sh ] && . $HOME/.keychain/$HOSTNAME-sh

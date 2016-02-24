@@ -5,9 +5,17 @@ if [ "$color_prompt" = yes ]; then
     PS1='${debian_chroot:+($debian_chroot)}\[\033[1;34m\]\u\[\033[0m\]@\[\033[1;35m\]\h\[\033[0m\]:\[\033[1;32m\]\w\[\033[0m\]\$ '
 else
     #PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[1;34m\]\u\[\033[0m\]@\[\033[1;35m\]\h\[\033[0m\]:\[\033[1;32m\]\w\[\033[0m\]\$ '
+    #PS1='${debian_chroot:+($debian_chroot)}\[\033[1;34m\]\u\[\033[0m\]@\[\033[1;35m\]\h\[\033[0m\]:\[\033[1;32m\]\w\[\033[0m\]\$ '
+    # GIT-Prompt with "source git-prompt.sh":
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[1;34m\]\u\[\033[0m\]@\[\033[1;35m\]\h\[\033[0m\]:\[\033[1;32m\]\w\[\033[0m\]\[\033[1;31m\]$(__git_ps1)\[\033[0m\]\$ '
+
 fi
 unset color_prompt force_color_prompt
+
+## Souce .git-prompt.sh
+## Get it from:
+## https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh
+source ~/stuff/git-prompt.sh
 
 
 #Add timestamps and linenumbers to .bash_history
@@ -18,6 +26,8 @@ HISTCONTROL=ignoredups
 
 # append to the history file, don't overwrite it
 shopt -s histappend
+# and write it immediately to .bash_history! not only when the shell exists (cleanly)!!!
+PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTSIZE=10000
@@ -31,8 +41,9 @@ shopt -s checkwinsize
 # Aliases
 alias ll='ls -lach'
 alias lS='ls -lachS'
-
+alias lt='ls -lacht'
 alias r='sudo -i'
+alias doch='sudo !!'
 
 # Version Control System aliases
 alias cvsst='cvs status 2>&1 | egrep "(^\? |Status: )" | grep -v Up-to-date'
@@ -44,15 +55,26 @@ alias svnpropdelx='svn propdel svn:executable'
 svngrepfind() { find . -type f -not -path "*/.svn/*" -exec grep -l "$*" '{}' ';';  }
 svnaddallindir() { svn add $(svn st | grep ^? | awk '{print $2}' | paste -s); }
 
+alias traceroute='echo -e "\033[1;32mSwitching to ICMP Traceroute\033[0m"; sudo traceroute -I'
+
 # Config file stuff
 # Opens all files with the specified name found in the current directory or below
 viap() { vi $(find . -name apache.properties | paste -s); }
 visp() { vi $(find . -name secret.properties | paste -s); }
 vitp() { vi $(find . -name "tomcat?.properties" | paste -s); }
 
+# OpenSSL
+ssl_verify_cert() { openssl x509 -in $1 -text; }
+ssl_verify_csr() { openssl req -in $1 -text -verify; }
+ssl_verify_ocsp() { openssl ocsp -issuer PATH/TO/ISSUING.crt -CAfile  PATH/TO/ROOT.crt -cert $1 -url OCSP-URL-HERE -nonce; }
+ssl_create_csr() { openssl req -new -newkey rsa:2048 -nodes -subj "/O=some/OU=thing/CN=$1" -keyout "$HOME/csrs/$1.key" -out "$HOME/$1.csr"; }
+
+
 # rdesktop alias
 alias winbox='read -s -p "Enter Password:" mypassword;rdesktop -a 16 -k de -g 1280x1024 -u $USER -d DOMAIN -p $mypassword winbox.lan.domain &'
 
+# Logging of SSL-Session keys to inspect SSL-Traffic
+export SSLKEYLOGFILE="$HOME"/.sslkeylog.log
 
 ##
 ## Bash completion for SSH Hosts

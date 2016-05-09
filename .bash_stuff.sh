@@ -70,7 +70,7 @@ ssl_verify_ocsp() { openssl ocsp -issuer PATH/TO/ISSUING.crt -CAfile  PATH/TO/RO
 ssl_verify_key() { openssl rsa -in $1 -check -noout; }
 ssl_verify_cert2key() {
   if [ "$#" -lt 2 ]; then
-    echo "Usage: puki_verify_cert2key certificate privatekey";
+    echo "Usage: ssl_verify_cert2key certificate privatekey";
   else
     diff  <(openssl x509 -in $1 -pubkey -noout) <(openssl rsa -in $2 -pubout 2>/dev/null);
     if [ "$?" -eq 0 ];then

@@ -67,6 +67,19 @@ vitp() { vi $(find . -name "tomcat?.properties" | paste -s); }
 ssl_verify_cert() { openssl x509 -in $1 -text; }
 ssl_verify_csr() { openssl req -in $1 -text -verify; }
 ssl_verify_ocsp() { openssl ocsp -issuer PATH/TO/ISSUING.crt -CAfile  PATH/TO/ROOT.crt -cert $1 -url OCSP-URL-HERE -nonce; }
+ssl_verify_key() { openssl rsa -in $1 -check -noout; }
+ssl_verify_cert2key() {
+  if [ "$#" -lt 2 ]; then
+    echo "Usage: puki_verify_cert2key certificate privatekey";
+  else
+    diff  <(openssl x509 -in $1 -pubkey -noout) <(openssl rsa -in $2 -pubout 2>/dev/null);
+    if [ "$?" -eq 0 ];then
+      echo "Certificate and PrivateKey match";
+    else
+      echo "Certificate and PivateKey DON'T match";
+    fi
+  fi;
+}
 ssl_create_csr() { openssl req -new -newkey rsa:2048 -nodes -subj "/O=some/OU=thing/CN=$1" -keyout "$HOME/csrs/$1.key" -out "$HOME/$1.csr"; }
 
 

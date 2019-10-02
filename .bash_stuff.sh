@@ -43,7 +43,7 @@ alias ll='ls -lach'
 alias lS='ls -lachS'
 alias lt='ls -lacht'
 alias r='sudo -i'
-alias doch='sudo !!'
+alias doch='sudo "$BASH" -c "$(history -p !!)"'
 
 # Version Control System aliases
 alias cvsst='cvs status 2>&1 | egrep "(^\? |Status: )" | grep -v Up-to-date'
@@ -64,6 +64,20 @@ visp() { vi $(find . -name secret.properties | paste -s); }
 vitp() { vi $(find . -name "tomcat?.properties" | paste -s); }
 
 # OpenSSL
+openssl_test_connection() { if [ "$#" -lt 1 ]; then
+    echo "Usage: openssl_test_connection FQDN <PORT> (Port defaults to 443 if not given)";
+  else
+    FQDN="$1"
+    PORT="$2"
+
+    # If port is empty, set to 443
+    if [ -z "$PORT" ]; then
+      PORT="443"
+    fi
+
+  openssl s_client -connect "$FQDN":"$PORT";
+fi;
+}
 ssl_verify_cert() { openssl x509 -in $1 -text; }
 ssl_verify_csr() { openssl req -in $1 -text -verify; }
 ssl_verify_ocsp() { openssl ocsp -issuer PATH/TO/ISSUING.crt -CAfile  PATH/TO/ROOT.crt -cert $1 -url OCSP-URL-HERE -nonce; }
@@ -97,21 +111,54 @@ complete -F _known_hosts host
 complete -F _known_hosts ping
 complete -F _known_hosts traceroute
 
+# Generate base64 credentials line
+## echo without newline is VERY important ;-)
+create_base64_creds() {
+  if [ "$#" -lt 1 ]; then
+    echo "create_base64_creds: Create base64 credentials to use in Basic-Authorization requests"
+    echo "Usage: create_base64_creds PASSWORD [USERNAME]"
+  elif [ "$#" -eq 1 ]; then
+    PASSWORD="$1"
+    USERNAME="$USER"
+  elif [ "$#" -eq 2 ]; then
+    PASSWORD="$1"
+    USERNAME="$2"
+  else
+    echo "More than 2 arguments provided. Aborting."
+    echo "Usage: create_base64_creds PASSWORD [USERNAME]"
+  fi
+
+  BASE64=$(echo -n "$USERNAME:$PASSWORD" | base64)
+  echo "Your string is: $BASE64"
+  echo "Use it with curl like: curl -H 'Authorization: Basic $BASE64'"
+}
+
+# Foreman API - delete Hosts
+# Don't forget to generate BASE64 string WITHOUT newline ;-)
+foreman2delete() { curl -XDELETE http://foreman.domain.tld/api/hosts/$1; }
+foreman4delete() { curl -H 'Authorization: Basic BLABLABLABASE64=' -XDELETE https://foreman.domain.tld/api/hosts/$1; }
+
+# man alias
+# to prevent color codes spreading into other commands, as they can't be properly escaped with the end codes
+# This makes the LESS_TERMCAP_* variables below redundant, as they have to be set via the pager script
+# script is under scripts in this repo.
+alias man="PAGER=$HOME/stuff/man-pager man"
+
 # Colored manpages
 # CHANGE FIRST NUMBER PAIR FOR COMMAND AND FLAG COLOR
 # currently 1;31 which is bold red
-export LESS_TERMCAP_md=$'\E[1;31;5;74m'  # begin bold
+##export LESS_TERMCAP_md=$'\E[1;31;5;74m'  # begin bold
 
 # CHANGE FIRST NUMBER PAIR FOR PARAMETER COLOR
 # currently 0;32 which is green
-export LESS_TERMCAP_us=$'\E[0;32;5;146m' # begin underline
+##export LESS_TERMCAP_us=$'\E[0;32;5;146m' # begin underline
 
 # don't change anything here
-export LESS_TERMCAP_mb=$'\E[1;31m'       # begin blinking
-export LESS_TERMCAP_me=$'\E[0m'           # end mode
-export LESS_TERMCAP_se=$'\E[0m'           # end standout-mode
-export LESS_TERMCAP_so=$'\E[38;5;246m'    # begin standout-mode - info box
-export LESS_TERMCAP_ue=$'\E[0m'           # end underline
+##export LESS_TERMCAP_mb=$'\E[1;31m'       # begin blinking
+##export LESS_TERMCAP_me=$'\E[0m'           # end mode
+##export LESS_TERMCAP_se=$'\E[0m'           # end standout-mode
+##export LESS_TERMCAP_so=$'\E[38;5;246m'    # begin standout-mode - info box
+##export LESS_TERMCAP_ue=$'\E[0m'           # end underline
 
 # Keychain Config
 /usr/bin/keychain --nogui -q --agents ssh $USER

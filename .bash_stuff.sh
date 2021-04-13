@@ -280,7 +280,11 @@ binaryToIPv6() {
 		sed -e 's/:[0:]*:/::/' -e 's/^0*//' -e 's/:$//'
 }
 
-
+# Source: https://twitter.com/rfc3849/status/1366412469577674755
+# Put in .bashrc and use as "stdwhat <command>" to see what is stderr and stdout.
+stdwhat() {
+  $* 2> >(sed 's/^/stderr(2): /') > >(sed 's/^/stdout(1): /')
+}
 
 
 

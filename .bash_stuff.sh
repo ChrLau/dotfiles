@@ -160,10 +160,17 @@ alias man="PAGER=$HOME/stuff/man-pager man"
 ##export LESS_TERMCAP_so=$'\E[38;5;246m'    # begin standout-mode - info box
 ##export LESS_TERMCAP_ue=$'\E[0m'           # end underline
 
+# SSH Agent config
+if [ -z "$SSH_AUTH_SOCK" ]; then
+  eval $(ssh-agent -s)
+  ssh-add ~/.ssh/id_filename
+fi
+
+# Alternatively: Keychain config
 # Keychain Config
-/usr/bin/keychain --nogui -q --agents ssh $USER
-[ -z "$HOSTNAME" ] && HOSTNAME=`uname -n`
-[ -f $HOME/.keychain/$HOSTNAME-sh ] && . $HOME/.keychain/$HOSTNAME-sh
+#/usr/bin/keychain --nogui -q --agents ssh $USER
+#[ -z "$HOSTNAME" ] && HOSTNAME=`uname -n`
+#[ -f $HOME/.keychain/$HOSTNAME-sh ] && . $HOME/.keychain/$HOSTNAME-sh
 
 
 # Taken from: https://www.netmeister.org/ip.sh

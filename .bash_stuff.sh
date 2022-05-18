@@ -78,6 +78,26 @@ openssl_test_connection() { if [ "$#" -lt 1 ]; then
   openssl s_client -connect "$FQDN":"$PORT";
 fi;
 }
+
+# OpenSSL s_client via Proxy
+# Requires OpenSSL of atleast version 1.1.0!
+# Connects to the given FQDN via hardcoded proxy. Useful if you can't define http_proxy for whatever reasons
+openssl_test_connection_proxy() { if [ "$#" -lt 1 ]; then
+    echo "Usage: openssl_test_connection_proxy FQDN <PORT> (Port defaults to 443 if not given)";
+  else
+    FQDN="$1"
+    PORT="$2"
+
+    # If port is empty, set to 443
+    if [ -z "$PORT" ]; then
+      PORT="443"
+    fi
+    
+  # Hostname for proxy works too, of course
+  openssl s_client -proxy ip.ip.ip.ip:port -connect "$FQDN":"$PORT";
+fi;
+}
+
 ssl_verify_cert() { openssl x509 -in $1 -text; }
 ssl_verify_csr() { openssl req -in $1 -text -verify; }
 ssl_verify_ocsp() { openssl ocsp -issuer PATH/TO/ISSUING.crt -CAfile  PATH/TO/ROOT.crt -cert $1 -url OCSP-URL-HERE -nonce; }

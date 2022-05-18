@@ -83,7 +83,7 @@ fi;
 # Requires OpenSSL of atleast version 1.1.0!
 # Connects to the given FQDN via hardcoded proxy. Useful if you can't define http_proxy for whatever reasons
 openssl_test_connection_proxy() { if [ "$#" -lt 1 ]; then
-    echo "Usage: openssl_test_connection_proxy FQDN <PORT> (Port defaults to 443 if not given)";
+    echo "Usage: openssl_test_connection FQDN <PORT> (Port defaults to 443 if not given)";
   else
     FQDN="$1"
     PORT="$2"
@@ -92,9 +92,28 @@ openssl_test_connection_proxy() { if [ "$#" -lt 1 ]; then
     if [ -z "$PORT" ]; then
       PORT="443"
     fi
-    
-  # Hostname for proxy works too, of course
-  openssl s_client -proxy ip.ip.ip.ip:port -connect "$FQDN":"$PORT";
+
+    # TODO: Compare proxy variables and if we have more than 1 proxy present a list which one to choose
+    # We just check if there is ANY value
+    # ... And use https_proxy anyways.. But hey, that's what I need in this environment currently.. ;-)
+    # And the sed regex goes for http:// only, not https://..
+    # This proxy stuff is a mess.. And not really got specified/enforced..
+
+    if [ -n "$http_proxy" ] || [ -n "$HTTP_PROXY" ] || [ -n "$https_proxy" ] || [ -n "$HTTPS_PROXY" ] || [ -n "$ftp_proxy" ] || [ -n "$FTP_PROXY" ]; then
+
+      read -p "Found proxy environment variables. Use this proxy? (y/N)" -n 1 -r
+      echo ""
+
+      if [[ $REPLY =~ ^[Yy]$ ]]; then
+
+        PROXY=$(sed 's#http\:\/\/##' <<< $https_proxy)
+        openssl s_client -proxy "$PROXY" -connect "$FQDN":"$PORT";
+
+      fi
+
+    else
+      openssl s_client -connect "$FQDN":"$PORT";
+    fi
 fi;
 }
 

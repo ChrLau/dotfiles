@@ -199,7 +199,16 @@ alias man="PAGER=$HOME/stuff/man-pager man"
 ##export LESS_TERMCAP_so=$'\E[38;5;246m'    # begin standout-mode - info box
 ##export LESS_TERMCAP_ue=$'\E[0m'           # end underline
 
+
 # SSH Agent config
+# Preferrably use keychain.. 
+
+# If not running interactively, don't do anything
+# Needed when not already present, as scp still executes "ssh -c $shell" which sources .bashrc, etc.
+# And then any dialog will prevent logging on (looking at you SuSE!)
+# Else this has to come BEFORE the agent stuff (generally on top of your .bashrc/.profile/etc.)
+[ -z "$PS1" ] && return
+
 if [ -z "$SSH_AUTH_SOCK" ]; then
   eval $(ssh-agent -s)
   ssh-add ~/.ssh/id_filename

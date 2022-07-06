@@ -260,9 +260,9 @@ emptydirlist() {
   echo "Searching for empty directories in: $DIR"
   echo "Writing results to: $HOME/empty-dirs.list"
 
-  echo "# List generated via: find $DIR -type d -empty >> \"$HOME/empty-dirs.list\"" > "$HOME/empty-dirs.list"
+  echo "# List generated via: find \"$DIR\" -type d -empty >> \"$HOME/empty-dirs.list\"" > "$HOME/empty-dirs.list"
 
-  find $DIR -type d -empty >> "$HOME/empty-dirs.list"
+  find "$DIR" -type d -empty >> "$HOME/empty-dirs.list"
 }
 
 

@@ -220,6 +220,24 @@ fi
 #[ -z "$HOSTNAME" ] && HOSTNAME=`uname -n`
 #[ -f $HOME/.keychain/$HOSTNAME-sh ] && . $HOME/.keychain/$HOSTNAME-sh
 
+# Searches all files older than X days and prints their size in GB
+oldfilesize() {
+
+  if [[ -z "$1" ]]; then
+    read -p "Find files older than how many days? " -r
+  else
+    REPLY="$1"
+  fi
+
+  regexint='^[0-9]+$'
+
+  if ! [[ $REPLY =~ $regexint ]] ; then
+     echo "Error: Enter a number" >&2
+  else
+    find . -type f -mtime +$REPLY -printf '%s\n' | awk  '{a+=$1;} END {printf "Files older than %d days consume: %.1f GB\n", REPLY, a/2**30;}' REPLY="$REPLY"
+  fi
+
+}
 
 # Taken from: https://www.netmeister.org/ip.sh
 # After reading: https://twitter.com/jschauma/status/1366601263740239874

@@ -233,11 +233,38 @@ oldfilesize() {
 
   if ! [[ $REPLY =~ $regexint ]] ; then
      echo "Error: Enter a number" >&2
+     return 1
   else
     find . -type f -mtime +$REPLY -printf '%s\n' | awk  '{a+=$1;} END {printf "Files older than %d days consume: %.1f GB\n", REPLY, a/2**30;}' REPLY="$REPLY"
   fi
 
 }
+
+# Finds all empty directories below a given path (or PWD) and writes them into a logfile
+emptydirlist() {
+
+  # Use PWD as path for find if no path is given
+  if [[ -z "$1" ]]; then
+    DIR="$PWD"
+  else
+    DIR="$1"
+  fi
+
+  if [[ -e "$HOME/empty-dirs.list" ]]; then
+    echo "File $HOME/empty-dirs.list exists. Not overwriting. Aborting."
+    return 1
+  else
+    FILE="$HOME/empty-dirs.list"
+  fi
+
+  echo "Searching for empty directories in: $DIR"
+  echo "Writing results to: $HOME/empty-dirs.list"
+
+  echo "# List generated via: find $DIR -type d -empty >> \"$HOME/empty-dirs.list\"" > "$HOME/empty-dirs.list"
+
+  find $DIR -type d -empty >> "$HOME/empty-dirs.list"
+}
+
 
 # Taken from: https://www.netmeister.org/ip.sh
 # After reading: https://twitter.com/jschauma/status/1366601263740239874

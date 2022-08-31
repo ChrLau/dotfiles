@@ -214,6 +214,11 @@ alias man="PAGER=$HOME/stuff/man-pager man"
 #  eval $(ssh-agent -s)
 #  ssh-add ~/.ssh/id_filename
 #fi
+#
+# IF used, at least add the following to your ~/.bash_logout
+#if [ -n "$SSH_AUTH_SOCK" ] ; then
+#  eval `/usr/bin/ssh-agent -k`
+#fi
 
 # Better approach, still insecure. But at least not dozens of left-behind agent processes and /tmp-files.
 # Keychain is still better.. ssh-ident seems not be that much actively maintained and available as keychain.

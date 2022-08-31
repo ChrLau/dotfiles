@@ -209,9 +209,25 @@ alias man="PAGER=$HOME/stuff/man-pager man"
 # Else this has to come BEFORE the agent stuff (generally on top of your .bashrc/.profile/etc.)
 [ -z "$PS1" ] && return
 
-if [ -z "$SSH_AUTH_SOCK" ]; then
-  eval $(ssh-agent -s)
-  ssh-add ~/.ssh/id_filename
+# After reading https://rabexc.org/posts/pitfalls-of-ssh-agents we don't use it anymore ;-)
+#if [ -z "$SSH_AUTH_SOCK" ]; then
+#  eval $(ssh-agent -s)
+#  ssh-add ~/.ssh/id_filename
+#fi
+
+# Better approach, still insecure. But at least not dozens of left-behind agent processes and /tmp-files.
+# Keychain is still better.. ssh-ident seems not be that much actively maintained and available as keychain.
+ssh-add -l &>/dev/null
+if [ "$?" == 2 ]; then
+  test -r ~/.ssh-agent && \
+    eval "$(<~/.ssh-agent)" >/dev/null
+
+  ssh-add -l &>/dev/null
+  if [ "$?" == 2 ]; then
+    (umask 066; ssh-agent > ~/.ssh-agent)
+    eval "$(<~/.ssh-agent)" >/dev/null
+    ssh-add
+  fi
 fi
 
 # Alternatively: Keychain config

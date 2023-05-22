@@ -286,7 +286,10 @@ stdwhat() {
   $* 2> >(sed 's/^/stderr(2): /') > >(sed 's/^/stdout(1): /')
 }
 
-
+# iptables is replaced by nft - but they have no iptables-apply pendant..
+# First verify v4 and v6 rules, than apply them, than export the ruleset to /etc/nftables.conf
+# Yes, it doesn't revert after a few seconds.. still a todo
+alias nft-apply="nft -c -f /root/nftables.v4 && nft -c -f /root/nftables.v6 && nft flush ruleset && nft -f /root/nftables.v4 && nft -f /root/nftables.v6 && nft -s list ruleset > /etc/nftables.conf"
 
 
 

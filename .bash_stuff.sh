@@ -78,6 +78,45 @@ openssl_test_connection() { if [ "$#" -lt 1 ]; then
   openssl s_client -connect "$FQDN":"$PORT";
 fi;
 }
+
+# OpenSSL s_client via Proxy
+# Requires OpenSSL of atleast version 1.1.0!
+# Connects to the given FQDN via hardcoded proxy. Useful if you can't define http_proxy for whatever reasons
+openssl_test_connection_proxy() { if [ "$#" -lt 1 ]; then
+    echo "Usage: openssl_test_connection FQDN <PORT> (Port defaults to 443 if not given)";
+  else
+    FQDN="$1"
+    PORT="$2"
+
+    # If port is empty, set to 443
+    if [ -z "$PORT" ]; then
+      PORT="443"
+    fi
+
+    # TODO: Compare proxy variables and if we have more than 1 proxy present a list which one to choose
+    # We just check if there is ANY value
+    # ... And use https_proxy anyways.. But hey, that's what I need in this environment currently.. ;-)
+    # And the sed regex goes for http:// only, not https://..
+    # This proxy stuff is a mess.. And not really got specified/enforced..
+
+    if [ -n "$http_proxy" ] || [ -n "$HTTP_PROXY" ] || [ -n "$https_proxy" ] || [ -n "$HTTPS_PROXY" ] || [ -n "$ftp_proxy" ] || [ -n "$FTP_PROXY" ]; then
+
+      read -p "Found proxy environment variables. Use this proxy? (y/N)" -n 1 -r
+      echo ""
+
+      if [[ $REPLY =~ ^[Yy]$ ]]; then
+
+        PROXY=$(sed 's#http\:\/\/##' <<< $https_proxy)
+        openssl s_client -proxy "$PROXY" -connect "$FQDN":"$PORT";
+
+      fi
+
+    else
+      openssl s_client -connect "$FQDN":"$PORT";
+    fi
+fi;
+}
+
 ssl_verify_cert() { openssl x509 -in $1 -text; }
 ssl_verify_csr() { openssl req -in $1 -text -verify; }
 ssl_verify_ocsp() { openssl ocsp -issuer PATH/TO/ISSUING.crt -CAfile  PATH/TO/ROOT.crt -cert $1 -url OCSP-URL-HERE -nonce; }
@@ -160,10 +199,92 @@ alias man="PAGER=$HOME/stuff/man-pager man"
 ##export LESS_TERMCAP_so=$'\E[38;5;246m'    # begin standout-mode - info box
 ##export LESS_TERMCAP_ue=$'\E[0m'           # end underline
 
+
+# SSH Agent config
+# Preferrably use keychain.. 
+
+# If not running interactively, don't do anything
+# Needed when not already present, as scp still executes "ssh -c $shell" which sources .bashrc, etc.
+# And then any dialog will prevent logging on (looking at you SuSE!)
+# Else this has to come BEFORE the agent stuff (generally on top of your .bashrc/.profile/etc.)
+[ -z "$PS1" ] && return
+
+# After reading https://rabexc.org/posts/pitfalls-of-ssh-agents we don't use it anymore ;-)
+#if [ -z "$SSH_AUTH_SOCK" ]; then
+#  eval $(ssh-agent -s)
+#  ssh-add ~/.ssh/id_filename
+#fi
+#
+# IF used, at least add the following to your ~/.bash_logout
+#if [ -n "$SSH_AUTH_SOCK" ] ; then
+#  eval `/usr/bin/ssh-agent -k`
+#fi
+
+# Better approach, still insecure. But at least not dozens of left-behind agent processes and /tmp-files.
+# Keychain is still better.. ssh-ident seems not be that much actively maintained and available as keychain.
+ssh-add -l &>/dev/null
+if [ "$?" == 2 ]; then
+  test -r ~/.ssh-agent && \
+    eval "$(<~/.ssh-agent)" >/dev/null
+
+  ssh-add -l &>/dev/null
+  if [ "$?" == 2 ]; then
+    (umask 066; ssh-agent > ~/.ssh-agent)
+    eval "$(<~/.ssh-agent)" >/dev/null
+    ssh-add
+  fi
+fi
+
+# Alternatively: Keychain config
 # Keychain Config
-/usr/bin/keychain --nogui -q --agents ssh $USER
-[ -z "$HOSTNAME" ] && HOSTNAME=`uname -n`
-[ -f $HOME/.keychain/$HOSTNAME-sh ] && . $HOME/.keychain/$HOSTNAME-sh
+#/usr/bin/keychain --nogui -q --agents ssh $USER
+#[ -z "$HOSTNAME" ] && HOSTNAME=`uname -n`
+#[ -f $HOME/.keychain/$HOSTNAME-sh ] && . $HOME/.keychain/$HOSTNAME-sh
+
+# Searches all files older than X days and prints their size in GB
+oldfilesize() {
+
+  if [[ -z "$1" ]]; then
+    read -p "Find files older than how many days? " -r
+  else
+    REPLY="$1"
+  fi
+
+  regexint='^[0-9]+$'
+
+  if ! [[ $REPLY =~ $regexint ]] ; then
+     echo "Error: Enter a number" >&2
+     return 1
+  else
+    find . -type f -mtime +$REPLY -printf '%s\n' | awk  '{a+=$1;} END {printf "Files older than %d days consume: %.1f GB\n", REPLY, a/2**30;}' REPLY="$REPLY"
+  fi
+
+}
+
+# Finds all empty directories below a given path (or PWD) and writes them into a logfile
+emptydirlist() {
+
+  # Use PWD as path for find if no path is given
+  if [[ -z "$1" ]]; then
+    DIR="$PWD"
+  else
+    DIR="$1"
+  fi
+
+  if [[ -e "$HOME/empty-dirs.list" ]]; then
+    echo "File $HOME/empty-dirs.list exists. Not overwriting. Aborting."
+    return 1
+  else
+    FILE="$HOME/empty-dirs.list"
+  fi
+
+  echo "Searching for empty directories in: $DIR"
+  echo "Writing results to: $HOME/empty-dirs.list"
+
+  echo "# List generated via: find \"$DIR\" -type d -empty >> \"$HOME/empty-dirs.list\"" > "$HOME/empty-dirs.list"
+
+  find "$DIR" -type d -empty >> "$HOME/empty-dirs.list"
+}
 
 
 # Taken from: https://www.netmeister.org/ip.sh

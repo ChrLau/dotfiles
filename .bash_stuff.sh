@@ -134,6 +134,8 @@ ssl_verify_cert2key() {
   fi;
 }
 ssl_create_csr() { openssl req -new -newkey rsa:2048 -nodes -subj "/O=some/OU=thing/CN=$1" -keyout "$HOME/csrs/$1.key" -out "$HOME/$1.csr"; }
+ssl_fingerprint_sha1() { openssl x509 -in $1 -noout -fingerprint; }
+ssl_fingerprint_sha256() { openssl x509 -in $1 -noout -fingerprint -sha256; }
 
 
 # rdesktop alias

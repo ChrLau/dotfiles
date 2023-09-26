@@ -133,6 +133,18 @@ ssl_verify_cert2key() {
     fi
   fi;
 }
+ssl_verify_cert2ca() {
+  if [ "$#" -lt 2 ]; then
+    echo "Usage: ssl_verify_cert2ca ca.crt certificate.crt";
+  else
+    openssl verify -CAfile $1 $2 2>&1/dev/null
+    if [ "$?" -eq 0 ]; then
+      echo "$1 signed $2: OK"
+    else
+      echo "$1 DID NOT sign $2: Error"
+    fi
+  fi
+}
 ssl_create_csr() { openssl req -new -newkey rsa:2048 -nodes -subj "/O=some/OU=thing/CN=$1" -keyout "$HOME/csrs/$1.key" -out "$HOME/$1.csr"; }
 ssl_fingerprint_sha1() { openssl x509 -in $1 -noout -fingerprint; }
 ssl_fingerprint_sha256() { openssl x509 -in $1 -noout -fingerprint -sha256; }

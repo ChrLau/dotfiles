@@ -5,6 +5,8 @@
 ## Initial work done by: Stephan Schmieder <ssc@unixgu.ru>
 ## I used his work as a base for mine.
 ##
+## Started using tmux, therefore I regularly forget this:
+## Scrolling in screen with: Ctrl+a, [
 
 ########################################################
 #                                                      #

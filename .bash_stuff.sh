@@ -57,6 +57,9 @@ svnaddallindir() { svn add $(svn st | grep ^? | awk '{print $2}' | paste -s); }
 
 alias traceroute='echo -e "\033[1;32mSwitching to ICMP Traceroute\033[0m"; sudo traceroute -I'
 
+# Alias to list duplicate SSH Host-keys in known_hosts file and out them sorted by the hostkey
+alias ldhk="awk '{print \$3}' known_hosts |sort|uniq -d|grep -F -f - known_hosts | sort -k 3,3 | column -t -R'1,2,3'"
+
 # Config file stuff
 # Opens all files with the specified name found in the current directory or below
 viap() { vi $(find . -name apache.properties | paste -s); }

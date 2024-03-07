@@ -140,7 +140,7 @@ ssl_verify_cert2ca() {
   if [ "$#" -lt 2 ]; then
     echo "Usage: ssl_verify_cert2ca ca.crt certificate.crt";
   else
-    openssl verify -CAfile $1 $2 2>&1/dev/null
+    openssl verify -CAfile $1 $2 >/dev/null 2>&1
     if [ "$?" -eq 0 ]; then
       echo "$1 signed $2: OK"
     else

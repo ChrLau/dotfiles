@@ -412,5 +412,12 @@ stdwhat() {
 # Yes, it doesn't revert after a few seconds.. still a todo
 alias nft-apply="nft -c -f /root/nftables.v4 && nft -c -f /root/nftables.v6 && nft flush ruleset && nft -f /root/nftables.v4 && nft -f /root/nftables.v6 && nft -s list ruleset > /etc/nftables.conf"
 
+# Useful for scripts - taken from /usr/lib/apt/apt.systemd.daily
+debug_echo() {
+    # Display message if $VERBOSE >= 1
+    if [ "$VERBOSE" -ge 1 ]; then
+        echo "$1" 1>&2
+    fi
+}
 
 

@@ -57,6 +57,9 @@ svnaddallindir() { svn add $(svn st | grep ^? | awk '{print $2}' | paste -s); }
 
 alias traceroute='echo -e "\033[1;32mSwitching to ICMP Traceroute\033[0m"; sudo traceroute -I'
 
+# Alias to list duplicate SSH Host-keys in known_hosts file and print them sorted by the hostkey
+alias ldhk="awk '{print \$3}' known_hosts |sort|uniq -d|grep -F -f - known_hosts | sort -k 3,3 | column -t -R'1,2,3'"
+
 # Config file stuff
 # Opens all files with the specified name found in the current directory or below
 viap() { vi $(find . -name apache.properties | paste -s); }
@@ -133,7 +136,21 @@ ssl_verify_cert2key() {
     fi
   fi;
 }
+ssl_verify_cert2ca() {
+  if [ "$#" -lt 2 ]; then
+    echo "Usage: ssl_verify_cert2ca ca.crt certificate.crt";
+  else
+    openssl verify -CAfile $1 $2 >/dev/null 2>&1
+    if [ "$?" -eq 0 ]; then
+      echo "$1 signed $2: OK"
+    else
+      echo "$1 DID NOT sign $2: Error"
+    fi
+  fi
+}
 ssl_create_csr() { openssl req -new -newkey rsa:2048 -nodes -subj "/O=some/OU=thing/CN=$1" -keyout "$HOME/csrs/$1.key" -out "$HOME/$1.csr"; }
+ssl_fingerprint_sha1() { openssl x509 -in $1 -noout -fingerprint; }
+ssl_fingerprint_sha256() { openssl x509 -in $1 -noout -fingerprint -sha256; }
 
 
 # rdesktop alias

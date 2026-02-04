@@ -121,6 +121,7 @@ fi;
 }
 
 ssl_verify_cert() { openssl x509 -in $1 -text; }
+ssl_verify_cert_status() { if [ "openssl x509 -in $1 -text;" ]; then echo "Certificate OK: $1"; else echo "Certificae FAILED: $1"; fi }
 ssl_verify_csr() { openssl req -in $1 -text -verify; }
 ssl_verify_ocsp() { openssl ocsp -issuer PATH/TO/ISSUING.crt -CAfile  PATH/TO/ROOT.crt -cert $1 -url OCSP-URL-HERE -nonce; }
 ssl_verify_key() { openssl rsa -in $1 -check -noout; }

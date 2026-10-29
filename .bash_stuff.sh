@@ -55,6 +55,10 @@ alias svnpropdelx='svn propdel svn:executable'
 svngrepfind() { find . -type f -not -path "*/.svn/*" -exec grep -l "$*" '{}' ';';  }
 svnaddallindir() { svn add $(svn st | grep ^? | awk '{print $2}' | paste -s); }
 
+# Docker
+alias get_running_docker_names='docker container ls --format "{{.Names}}"'
+alias get_all_docker_names='docker container ls -a --format "{{.Names}}"'
+
 alias traceroute='echo -e "\033[1;32mSwitching to ICMP Traceroute\033[0m"; sudo traceroute -I'
 
 # Alias to list duplicate SSH Host-keys in known_hosts file and print them sorted by the hostkey

@@ -56,8 +56,9 @@ svngrepfind() { find . -type f -not -path "*/.svn/*" -exec grep -l "$*" '{}' ';'
 svnaddallindir() { svn add $(svn st | grep ^? | awk '{print $2}' | paste -s); }
 
 # Docker
-alias get_running_docker_names='docker container ls --format "{{.Names}}"'
-alias get_all_docker_names='docker container ls -a --format "{{.Names}}"'
+alias docker_get_running_container_names='docker container ls --format "{{.Names}}"'
+alias docker_get_all_container_names='docker container ls -a --format "{{.Names}}"'
+alias docker_get_unused_images='docker system df -v | sed -n "/^REPOSITORY/,/^\$/p" | { IFS= read -r header; echo "$header"; awk '\''$NF==0 {print $(NF-1), $0}'\'' | sort -hr -k1,1 | cut -d" " -f2-; }'
 
 alias traceroute='echo -e "\033[1;32mSwitching to ICMP Traceroute\033[0m"; sudo traceroute -I'
 
